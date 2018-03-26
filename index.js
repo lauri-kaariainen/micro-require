@@ -14,9 +14,10 @@ exports.require = function(urls, cb) {
   };
 
   // lib
-  var createScriptTag = function(url) {
+  var createScriptTag = function(url, isLastScript) {
     var script = document.createElement('script');
-    script.onload = function() { cb(null) };
+    if(isLastScript)
+      script.onload = function() { cb(null) };
     script.src = url;
     return script;
   };
@@ -26,9 +27,10 @@ exports.require = function(urls, cb) {
       if (typeof arguments[0] === 'string') {
         return script.parentNode.insertBefore(createScriptTag(arguments[0]), script);
       }
-      return Array.prototype.map.call(arguments[0], function (url) {
+      return Array.prototype.map.call(arguments[0], function (url,i) {
+        var wasLastScript = i === arguments[2].length - 1;
         if (typeof url !== 'string') return fail('Argument must be a string');
-        script.parentNode.insertBefore(createScriptTag(url), script);
+        script.parentNode.insertBefore(createScriptTag(url,wasLastScript), script);
       });
     }
   };
