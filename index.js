@@ -1,4 +1,8 @@
 exports.require = function(urls, cb) {
+  
+  var scriptsLength =
+    Array.isArray(urls) ? urls.length : 1;
+  
   //type checkers
   var isEmpty = function(arg) {
     return arg.length === 0;
@@ -14,10 +18,13 @@ exports.require = function(urls, cb) {
   };
 
   // lib
-  var createScriptTag = function(url, isLastScript) {
+  var createScriptTag = function(url) {
     var script = document.createElement('script');
-    if(isLastScript)
-      script.onload = function() { cb(null) };
+    script.onload = function () { 
+      scriptsLength--;
+      if (scriptsLength < 1)
+        cb(null);
+    };
     script.src = url;
     return script;
   };
@@ -27,10 +34,9 @@ exports.require = function(urls, cb) {
       if (typeof arguments[0] === 'string') {
         return script.parentNode.insertBefore(createScriptTag(arguments[0]), script);
       }
-      return Array.prototype.map.call(arguments[0], function (url,i) {
-        var wasLastScript = i === arguments[2].length - 1;
+      return Array.prototype.map.call(arguments[0], function (url) {
         if (typeof url !== 'string') return fail('Argument must be a string');
-        script.parentNode.insertBefore(createScriptTag(url,wasLastScript), script);
+        script.parentNode.insertBefore(createScriptTag(url), script);
       });
     }
   };
