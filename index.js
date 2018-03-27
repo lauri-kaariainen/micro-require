@@ -1,4 +1,4 @@
-exports.require = function(urls, cb) {
+window.require = function(urls, cb) {
   
   var scriptsLength =
     Array.isArray(urls) ? urls.length : 1;
